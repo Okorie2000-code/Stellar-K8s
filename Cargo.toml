@@ -44,10 +44,10 @@ clap_complete = "4.5"
 
 # Date/time handling
 chrono = { version = "0.4", features = ["serde"] }
-# Pinned to fix RUSTSEC-2026-0009 (stack exhaustion DoS); also used transitively
+# Pinned to fix RUSSEC-2026-0009 (stack exhaustion DoS); also used transitively
 # by rcgen/yasna/x509-parser.
 time = "0.3.47"
-# Pinned to fix RUSTSEC-2026-0007; used transitively by many HTTP/async crates.
+# Pinned to fix RUSSEC-2026-0007; used transitively by many HTTP/async crates.
 bytes = "1.11.1"
 
 # Zip compression for incident reports
@@ -114,6 +114,9 @@ x509-parser = { version = "0.16", features = ["verify"] }
 # Bounded Soroban RPC cache primitives and Wasm guest
 stellar-wasm-cache = { path = "wasm-plugins" }
 
+# Intelligent Prometheus metrics rate-limiter proxy
+stellar-telemetry = { path = "telemetry" }
+
 # Wasm runtime for custom validation plugins
 wasmtime = { version = "24.0.7", optional = true }
 wasmtime-wasi = { version = "24.0.7", features = ["preview1"], optional = true }
@@ -122,8 +125,6 @@ wasmtime-wasi = { version = "24.0.7", features = ["preview1"], optional = true }
 tokio-rustls = { version = "0.26", optional = true }
 
 # Base64 for Wasm plugin loading
-base64 = "0.21"
-
 # HMAC-SHA256 for webhook payload signing
 hmac = "0.12"
 http = "1"
@@ -165,8 +166,10 @@ md5 = "0.8.0"
 # tar archive extraction for snapshot bootstrapping (#119)
 tar = "0.4"
 
+# Terminal UI for kubectl-stellar validator diagnostics
+color-eye = "0.3"
 
-[build-dependencies]
+[server-dependencies]
 chrono = "0.4"
 serde_json = "1"
 walkdir = "2"
@@ -276,9 +279,15 @@ name = "stellar-cert-health"
 path = "src/bin/stellar-cert-health.rs"
 required-features = ["admission-webhook"]
 
+# Intelligent Prometheus metrics rate-limiter proxy for Stellar Core nodes.
+# Deployed as a sidecar: Prometheus → proxy:9091 → stellar-core:11626/metrics
+[[bin]]
+name = "stellar-metrics-proxy"
+path = "src/bin/stellar-metrics-proxy.rs"
+
 [[bench]]
 name = "crd_operations"
 harness = false
 
 [workspace]
-members = ["wasm-plugins", "security/p2p-firewall"]
+members = ["wasm-plugins", "security/p2p-firewall", "telemetry"]
